@@ -8,8 +8,26 @@ import Parser.ASTBuilders.AstBuilder.Companion.takeCommentsAndSemiColon
 
 class OperationBuilder : AstBuilder {
 
+    private val operators = listOf(
+        DataType.OPERATOR_PLUS,
+        DataType.OPERATOR_MINUS,
+        DataType.OPERATOR_MULTiPLY,
+        DataType.OPERATOR_DIVIDE
+    )
+
+    private val values = listOf(
+        DataType.NUMBER_VALUE,
+        DataType.STRING_VALUE,
+        DataType.VARIABLE_NAME
+    )
+
     override fun isValid(tokens: List<Token>): Boolean {
-        TODO("Not yet implemented")
+        val parsedTokens = takeCommentsAndSemiColon(tokens)
+        return when {
+            parsedTokens.isEmpty() -> false
+            parsedTokens.size == 1 -> parsedTokens[0].type in values
+            else -> parsedTokens.size > 2 && parsedTokens.any { it.type in operators } && parsedTokens.any { it.type in values }
+        }
     }
 
     override fun build(tokens: List<Token>): AST {
@@ -22,12 +40,7 @@ class OperationBuilder : AstBuilder {
 
         for (token in postfix) {
             when (token.type) {
-                !in listOf(
-                    DataType.OPERATOR_PLUS,
-                    DataType.OPERATOR_MINUS,
-                    DataType.OPERATOR_MULTiPLY,
-                    DataType.OPERATOR_DIVIDE
-                ) -> {
+                !in operators -> {
                     when (token.type) {
                         DataType.NUMBER_VALUE -> nodes.add(OperationNumber(token))
                         DataType.STRING_VALUE -> nodes.add(OperationString(token))
