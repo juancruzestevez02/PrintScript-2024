@@ -11,10 +11,9 @@ class AssignationExecution: Executor<Assignation> {
 
     override fun execute(ast: Assignation, variables: MutableMap<String, Value>): String {
         val varName = ast.assignation.value
-        val type = getValueType(ast.assignation.type)
         val value = binaryOperator.evaluate(ast.value, variables)
         if (variables.containsKey(varName)){
-            if (value.getType() == type){
+            if (value.getType() == variables[varName].getType()){
                 variables[varName] = value
                 return ""
             }
